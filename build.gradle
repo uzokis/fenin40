@@ -8,7 +8,7 @@ buildscript {
 plugins {
 	id 'java' 
 	id 'eclipse' //or your favorite IDE
-	id 'com.github.johnrengelman.shadow' version '1.2.3'
+	id 'com.github.johnrengelman.shadow' version '5.1.0'
 }
 
 sourceCompatibility = 1.8
@@ -56,6 +56,7 @@ dependencies {
 // BUNDLING JAR WITH SHADOWJAR
 shadowJar {
     classifier = 'fat'
+    version = null
     manifest {
         attributes 'Main-Class': 'io.vertx.core.Launcher'
         attributes 'Main-Verticle': 'eu.fancybrackets.template.verticle.MainVerticle'
@@ -65,34 +66,38 @@ shadowJar {
     }
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.0'
-}
+task stage(dependsOn: [build, shadowJar])
 
 test {
     testLogging.showStandardStreams = true
 }
 
+
+
 // CONVENIENCE TASK TO RUN THE JAR DIRECTLY IN BUILD CONSOLE AND OUTPUT FINE LOGGING
-task runJar(dependsOn:shadowJar) << {
-    javaexec { 
-        main="-jar"
-        args =  [
-            "build/libs/$rootProject.name-$version-fat.jar"
-                ]
-        jvmArgs '-Djava.util.logging.config.file=logger.properties'
-    } 
+task runJar(dependsOn:shadowJar) {
+    doLast {
+        javaexec { 
+            main="-jar"
+            args =  [
+                "build/libs/$rootProject.name-$version-fat.jar"
+                    ]
+            jvmArgs '-Djava.util.logging.config.file=logger.properties'
+        }
+    }
 }
 
 // TASK TO RUN THE JOOQ CODE GENERATION
 // TODO check again vs cockroachdb when following is fixed: https://github.com/cockroachdb/cockroach/pull/9991 
-task generateJooq() << {
-    javaexec { 
-    	classpath = sourceSets.main.runtimeClasspath
-        main="org.jooq.util.GenerationTool"
-        args =  [
-            "./jooq-config.xml"
-                ]
-        jvmArgs '-Djava.util.logging.config.file=logger.properties'
-    } 
+task generateJooq() {
+    doLast {
+        javaexec { 
+    	    classpath = sourceSets.main.runtimeClasspath
+            main="org.jooq.util.GenerationTool"
+            args = [
+                "./jooq-config.xml"
+                    ]
+            jvmArgs '-Djava.util.logging.config.file=logger.properties'
+        }
+    }
 }

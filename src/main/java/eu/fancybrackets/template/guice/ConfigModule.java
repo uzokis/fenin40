@@ -80,8 +80,8 @@ public class ConfigModule extends AbstractModule {
 		//TODO move to config
 		HikariConfig config = new HikariConfig();
 		config.setJdbcUrl("jdbc:postgresql://localhost:5432/skeleton");
-		config.setUsername("postgres");
-		config.setPassword("");
+		config.setUsername("fancyuser");
+		config.setPassword("fancypassword");
 		
 		HikariDataSource ds = new HikariDataSource(config);
 		return ds;
