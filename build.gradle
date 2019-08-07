@@ -94,7 +94,7 @@ task generateJooq() {
     doLast {
         javaexec { 
     	    classpath = sourceSets.main.runtimeClasspath
-            main="org.jooq.util.GenerationTool"
+            main="org.jooq.codegen.GenerationTool"
             args = [
                 "./jooq-config.xml"
                     ]
