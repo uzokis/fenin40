@@ -4,9 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -23,6 +24,7 @@ import com.google.inject.Provides;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import io.vertx.config.ConfigRetriever;
 import io.vertx.core.Context;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
@@ -39,6 +41,9 @@ public class ConfigModule extends AbstractModule {
 
 	public ConfigModule(Vertx vertx, JsonObject config) throws IOException {
 		this.vertx = vertx;
+		ConfigRetriever retriever = ConfigRetriever.create(vertx);
+		
+		
 		if (config == null || config.isEmpty()) {
 			//falling back on internal config if vertx started without -conf argument
 			try (final InputStream is = getClass().getResourceAsStream("/config.json")) {
@@ -79,23 +84,27 @@ public class ConfigModule extends AbstractModule {
 	
 	@Provides
 	@Singleton
-	public DataSource provideDataSource() {
-		return null;
+	public DataSource provideDataSource() throws URISyntaxException {
 		//TODO move to config
-//		HikariConfig config = new HikariConfig();
-//		config.setJdbcUrl("jdbc:postgresql://localhost:5432/skeleton");
-//		config.setUsername("fancyuser");
-//		config.setPassword("fancypassword");
-//		
-//		HikariDataSource ds = new HikariDataSource(config);
-//		return ds;
+		URI dbUri = new URI(System.getenv("DATABASE_URL"));
+
+		HikariConfig config = new HikariConfig();
+        String username = dbUri.getUserInfo().split(":")[0];
+        String password = dbUri.getUserInfo().split(":")[1];
+        String dbUrl = String.format("jdbc:postgresql://%s:%s%s", dbUri.getHost(), dbUri.getPort(), dbUri.getPath());
+        config.setJdbcUrl(dbUrl);
+		config.addDataSourceProperty("sslmode", "require"); // required for heroku
+		config.setUsername(username);
+		config.setPassword(password);
+		
+		HikariDataSource ds = new HikariDataSource(config);
+		return ds;
 	}
 	
 	@Provides
 	@Inject
 	public DSLContext provideDSLContext(DataSource ds) {
-		return null;
 		//TODO temp disabled
-		//return DSL.using(ds, SQLDialect.POSTGRES);
+		return DSL.using(ds, SQLDialect.POSTGRES);
 	}
 }

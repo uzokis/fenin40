@@ -41,7 +41,7 @@ public class MainVerticle extends AbstractVerticle {
 		vertx.createHttpServer().requestHandler(router).listen(8080);
 
 		//disabled until db is fixed
-		//printDBVersion(injector.getInstance(DataSource.class));
+		printDBVersion(injector.getInstance(DataSource.class));
 	}
 
 	protected void printDBVersion(DataSource ds) {

@@ -15,10 +15,12 @@ public class ArduinoAPIVerticle extends AbstractVerticle {
 	@Inject
 	private ArduinoAPIHandler arduinoAPIHandler;
 	
+	public static String API_PARAM_CONTAINER_ID = "containerid";
+	
 	@Override
 	public void start() throws Exception {
 		super.start();
-		this.router.route("/api/:containerid").method(HttpMethod.GET).handler(arduinoAPIHandler::handleGet);
+		this.router.route(String.format("/api/:%s",API_PARAM_CONTAINER_ID)).method(HttpMethod.GET).handler(arduinoAPIHandler::handleGet);
 		//TODO add routes
 	}
 }

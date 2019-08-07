@@ -32,6 +32,7 @@ repositories {
 dependencies {
     compile group: 'io.vertx', name: 'vertx-core', version: "$versions.vertx"
     compile group: 'io.vertx', name: 'vertx-web', version: "$versions.vertx"
+    compile group: 'io.vertx', name: 'vertx-config', version: "$versions.vertx"
     // ENABLE FOR AUTHENTICATION VIA SHIRO
     //compile "io.vertx:vertx-auth-shiro:$versions.vertx"
     //compile "io.vertx:vertx-auth-common:$version.vertx"
