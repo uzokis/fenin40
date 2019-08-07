@@ -14,9 +14,15 @@ import org.jooq.impl.DSL;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 
 import eu.fancybrackets.template.guice.ConfigModule;
+import io.vertx.config.ConfigRetriever;
+import io.vertx.config.ConfigRetrieverOptions;
+import io.vertx.config.ConfigStoreOptions;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.ResponseTimeHandler;
 
@@ -33,7 +39,11 @@ public class MainVerticle extends AbstractVerticle {
 	@Override
 	public void start() throws Exception {
 		super.start();
-		injector = Guice.createInjector(new ConfigModule(vertx, this.config()));
+		
+		ConfigStoreOptions file = new ConfigStoreOptions().setType("file").setFormat("properties").setOptional(true)
+				.setConfig(new JsonObject().put("path", ".env"));
+		ConfigRetrieverOptions options = new ConfigRetrieverOptions().setIncludeDefaultStores(true).addStore(file).setScanPeriod(1000*60*60*24);
+		ConfigRetriever retriever = ConfigRetriever.create(vertx, options);
 
 		Router router = injector.getInstance(Router.class);
 		router.route().handler(ResponseTimeHandler.create());
@@ -42,12 +52,30 @@ public class MainVerticle extends AbstractVerticle {
 				.allowedHeader("Access-Control-Allow-Credentials").allowedHeader("Access-Control-Allow-Origin")
 				.allowedHeader("Access-Control-Allow-Headers").allowedHeader("Content-Type"));
 
-		vertx.deployVerticle(injector.getInstance(ArduinoAPIVerticle.class));
+		vertx.executeBlocking(future-> {
+			retriever.getConfig(ar -> {
+				if (ar.failed()) {
+					future.fail("Could not retrieve configuration!");
+				} else {
+					future.complete(ar.result());
+				}
+			});
+		}, res -> {
+			injector = Guice.createInjector(new ConfigModule(vertx, (JsonObject)res.result()));
 
-		vertx.createHttpServer().requestHandler(router).listen(8080);
+			Router router = injector.getInstance(Router.class);
+			router.route().handler(ResponseTimeHandler.create());
 
-		// disabled until db is fixed
-		// printDBVersion(injector.getInstance(DataSource.class));
+			vertx.deployVerticle(injector.getInstance(ArduinoAPIVerticle.class));
+			
+			Integer localPort = injector.getInstance(Key.get(Integer.class, Names.named(ConfigModule.LOCAL_PORT)));
+
+			//TODO should pbly go via config retriever
+			vertx.createHttpServer().requestHandler(router).listen(localPort);
+
+			//disabled until db is fixed
+			printDBVersion(injector.getInstance(DataSource.class));
+		});
 	}
 
 	protected void printDBVersion(DataSource ds) {

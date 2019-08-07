@@ -1,12 +1,8 @@
 package eu.fancybrackets.template.guice;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -16,8 +12,6 @@ import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.CharStreams;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.zaxxer.hikari.HikariConfig;
@@ -25,28 +19,20 @@ import com.zaxxer.hikari.HikariDataSource;
 
 import io.vertx.core.Context;
 import io.vertx.core.Vertx;
-import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
 
 public class ConfigModule extends AbstractModule {
-	public static final String RON_SWANSON_API_URL = "RonSwansonAPIURL";
+	public static final String LOCAL_PORT = "LOCAL_PORT";
 	private final Vertx vertx;
 	private final Context context;
 	private final JsonObject config;
 
-	public ConfigModule(Vertx vertx, JsonObject config) throws IOException {
+	public ConfigModule(Vertx vertx, JsonObject config) {
 		this.vertx = vertx;
-		if (config == null || config.isEmpty()) {
-			//falling back on internal config if vertx started without -conf argument
-			try (final InputStream is = getClass().getResourceAsStream("/config.json")) {
-				this.config = Buffer.factory.buffer(CharStreams.toString(new InputStreamReader(is, Charsets.UTF_8))).toJsonObject();
-			}
-		} else {
-			this.config = config;
-		}
+		this.config = config;
 		this.context = vertx.getOrCreateContext();
 	}
 
@@ -69,33 +55,35 @@ public class ConfigModule extends AbstractModule {
 	HttpClient getHttpClient() {
 		return vertx.createHttpClient();
 	}
+	
+	@Provides
+	@Singleton
+	@Named(LOCAL_PORT)
+	public Integer getLocalPort() {
+		return config.getInteger("PORT", new Integer(8080));
+	}
 
 	@Provides
 	@Singleton
-	@Named(RON_SWANSON_API_URL)
-	public URL RonSwansonAPIURL() throws MalformedURLException {
-		return new URL(config.getString(RON_SWANSON_API_URL));
+	public DataSource provideDataSource() throws URISyntaxException {
+		URI dbUri = new URI(config.getString("DATABASE_URL"));
+
+		HikariConfig config = new HikariConfig();
+		String username = dbUri.getUserInfo().split(":")[0];
+		String password = dbUri.getUserInfo().split(":")[1];
+		String dbUrl = String.format("jdbc:postgresql://%s:%s%s", dbUri.getHost(), dbUri.getPort(), dbUri.getPath());
+		config.setJdbcUrl(dbUrl);
+		config.addDataSourceProperty("sslmode", "require"); // required for heroku
+		config.setUsername(username);
+		config.setPassword(password);
+
+		HikariDataSource ds = new HikariDataSource(config);
+		return ds;
 	}
-	
-	@Provides
-	@Singleton
-	public DataSource provideDataSource() {
-		return null;
-		//TODO move to config
-//		HikariConfig config = new HikariConfig();
-//		config.setJdbcUrl("jdbc:postgresql://localhost:5432/skeleton");
-//		config.setUsername("fancyuser");
-//		config.setPassword("fancypassword");
-//		
-//		HikariDataSource ds = new HikariDataSource(config);
-//		return ds;
-	}
-	
+
 	@Provides
 	@Inject
 	public DSLContext provideDSLContext(DataSource ds) {
-		return null;
-		//TODO temp disabled
-		//return DSL.using(ds, SQLDialect.POSTGRES);
+		return DSL.using(ds, SQLDialect.POSTGRES);
 	}
 }

@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<configuration>
-  <!-- TESTING THIS WITH COCKROACHDB BUT NOT FULLY FUNCTIONAL -->
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.11.0.xsd">
   <!-- Configure the database connection here -->
   <jdbc>
     <driver>org.postgresql.Driver</driver>
-    <url>jdbc:postgresql://localhost:26257/skeleton</url>
-    <user>fancyuser</user>
-    <password>fancypassword</password>
+    <url>jdbc:postgresql://ec2-54-217-219-235.eu-west-1.compute.amazonaws.com:5432/d84erde7u5oh6a</url>
+    <user>jwubedghlriggz</user>
+    <password></password>
     
     <!-- You can also pass user/password and other JDBC properties in the optional properties tag: -->
     <properties>
-      <!-- property><key>user</key><value>fancyuser</value></property -->
+      <property><key>sslmode</key><value>require</value></property>
       <!-- property><key>password</key><value></value></property -->
     </properties>
   </jdbc>
@@ -18,26 +17,53 @@
   <generator>
     <database>
       <!-- The database dialect from jooq-meta. Available dialects are
-           named org.util.[database].[database]Database. Known values are:
+           named org.jooq.meta.[database].[database]Database.
+            
+           Natively supported values are:
+    
+               org.jooq.meta.ase.ASEDatabase
+               org.jooq.meta.auroramysql.AuroraMySQLDatabase
+               org.jooq.meta.aurorapostgres.AuroraPostgresDatabase
+               org.jooq.meta.cubrid.CUBRIDDatabase
+               org.jooq.meta.db2.DB2Database
+               org.jooq.meta.derby.DerbyDatabase
+               org.jooq.meta.firebird.FirebirdDatabase
+               org.jooq.meta.h2.H2Database
+               org.jooq.meta.hana.HANADatabase
+               org.jooq.meta.hsqldb.HSQLDBDatabase
+               org.jooq.meta.informix.InformixDatabase
+               org.jooq.meta.ingres.IngresDatabase
+               org.jooq.meta.mariadb.MariaDBDatabase
+               org.jooq.meta.mysql.MySQLDatabase
+               org.jooq.meta.oracle.OracleDatabase
+               org.jooq.meta.postgres.PostgresDatabase
+               org.jooq.meta.redshift.RedshiftDatabase
+               org.jooq.meta.sqldatawarehouse.SQLDataWarehouseDatabase
+               org.jooq.meta.sqlite.SQLiteDatabase
+               org.jooq.meta.sqlserver.SQLServerDatabase
+               org.jooq.meta.sybase.SybaseDatabase
+               org.jooq.meta.teradata.TeradataDatabase
+               org.jooq.meta.vertica.VerticaDatabase
+            
+           This value can be used to reverse-engineer generic JDBC DatabaseMetaData (e.g. for MS Access)
+           
+               org.jooq.meta.jdbc.JDBCDatabase
+                
+           This value can be used to reverse-engineer standard jOOQ-meta XML formats
+            
+               org.jooq.meta.xml.XMLDatabase
+    
+           This value can be used to reverse-engineer schemas defined by SQL files (requires jooq-meta-extensions dependency)
 
-           org.jooq.util.ase.ASEDatabase (to be used with Sybase ASE)
-           org.jooq.util.cubrid.CUBRIDDatabase
-           org.jooq.util.db2.DB2Database
-           org.jooq.util.derby.DerbyDatabase
-           org.jooq.util.h2.H2Database
-           org.jooq.util.hsqldb.HSQLDBDatabase
-           org.jooq.util.ingres.IngresDatabase
-           org.jooq.util.mysql.MySQLDatabase
-           org.jooq.util.oracle.OracleDatabase
-           org.jooq.util.postgres.PostgresDatabase
-           org.jooq.util.sqlite.SQLiteDatabase
-           org.jooq.util.sqlserver.SQLServerDatabase
-           org.jooq.util.sybase.SybaseDatabase (to be used with Sybase SQL Anywhere)
+               org.jooq.meta.extensions.ddl.DDLDatabase
+                   
+           This value can be used to reverse-engineer schemas defined by JPA annotated entities (requires jooq-meta-extensions dependency)
+                   
+               org.jooq.meta.extensions.jpa.JPADatabase
 
-           You can also provide your own org.jooq.util.Database implementation
-           here, if your database is currently not supported or if you wish to
-           read the database schema from a file, such as a Hibernate .hbm.xml file -->
-      <name>org.jooq.util.postgres.PostgresDatabase</name>
+           You can also provide your own org.jooq.meta.Database implementation
+           here, if your database is currently not supported -->
+      <name>org.jooq.meta.postgres.PostgresDatabase</name>
 
       <!-- All elements that are generated from your schema (A Java regular expression.
            Use the pipe to separate several expressions) Watch out for
@@ -52,7 +78,7 @@
 
       <!-- All elements that are excluded from your schema (A Java regular expression.
            Use the pipe to separate several expressions). Excludes match before
-           includes -->
+           includes, i.e. excludes have a higher priority -->
       <excludes>
            UNUSED_TABLE                # This table (unqualified name) should not be generated
          | PREFIX_.*                   # Objects with a given prefix should not be generated
@@ -66,10 +92,11 @@
 
            If left empty, jOOQ will generate all available schemata. See the
            manual's next section to learn how to generate several schemata -->
-      <inputSchema>skeleton</inputSchema>
+      <inputSchema>public</inputSchema>
     </database>
 
     <generate>
+      <pojos>true</pojos>
       <!-- Generation flags: See advanced configuration properties -->
     </generate>
 

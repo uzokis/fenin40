@@ -1,1 +1,1 @@
-web: java -jar build/libs/fenin40-fat.jar -Djava.util.logging.config.file=logger.properties
+web: java -jar build/libs/fenin40-0.0.1-fat.jar -Djava.util.logging.config.file=logger.properties
