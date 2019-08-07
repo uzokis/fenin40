@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -28,6 +29,7 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.StaticHandler;
 
 public class ConfigModule extends AbstractModule {
 	public static final String RON_SWANSON_API_URL = "RonSwansonAPIURL";
@@ -58,6 +60,7 @@ public class ConfigModule extends AbstractModule {
 	@Singleton
 	Router provideRouter() {
 		Router router = Router.router(vertx);
+		router.route("/static/*").handler(StaticHandler.create());
 		return router;
 	}
 
@@ -77,19 +80,22 @@ public class ConfigModule extends AbstractModule {
 	@Provides
 	@Singleton
 	public DataSource provideDataSource() {
+		return null;
 		//TODO move to config
-		HikariConfig config = new HikariConfig();
-		config.setJdbcUrl("jdbc:postgresql://localhost:5432/skeleton");
-		config.setUsername("fancyuser");
-		config.setPassword("fancypassword");
-		
-		HikariDataSource ds = new HikariDataSource(config);
-		return ds;
+//		HikariConfig config = new HikariConfig();
+//		config.setJdbcUrl("jdbc:postgresql://localhost:5432/skeleton");
+//		config.setUsername("fancyuser");
+//		config.setPassword("fancypassword");
+//		
+//		HikariDataSource ds = new HikariDataSource(config);
+//		return ds;
 	}
 	
 	@Provides
 	@Inject
 	public DSLContext provideDSLContext(DataSource ds) {
-		return DSL.using(ds, SQLDialect.POSTGRES);
+		return null;
+		//TODO temp disabled
+		//return DSL.using(ds, SQLDialect.POSTGRES);
 	}
 }

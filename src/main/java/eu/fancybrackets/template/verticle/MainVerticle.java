@@ -36,11 +36,12 @@ public class MainVerticle extends AbstractVerticle {
 		Router router = injector.getInstance(Router.class);
 		router.route().handler(ResponseTimeHandler.create());
 
-		vertx.deployVerticle(injector.getInstance(RonSwansonVerticle.class));
+		vertx.deployVerticle(injector.getInstance(ArduinoAPIVerticle.class));
 
-		vertx.createHttpServer().requestHandler(router::accept).listen(8080);
+		vertx.createHttpServer().requestHandler(router).listen(8080);
 
-		printDBVersion(injector.getInstance(DataSource.class));
+		//disabled until db is fixed
+		//printDBVersion(injector.getInstance(DataSource.class));
 	}
 
 	protected void printDBVersion(DataSource ds) {

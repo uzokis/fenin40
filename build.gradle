@@ -17,8 +17,8 @@ group = 'eu.fancybrackets.skeleton'
 version = '0.0.1'
 
 def versions = [
-    vertx: '3.2.1',
-    jooq: '3.8.4'
+    vertx: '3.8.0',
+    jooq: '3.11.11'
 ]
 
 repositories {
@@ -35,7 +35,7 @@ dependencies {
     // ENABLE FOR AUTHENTICATION VIA SHIRO
     //compile "io.vertx:vertx-auth-shiro:$versions.vertx"
     //compile "io.vertx:vertx-auth-common:$version.vertx"
-    compile group: 'com.google.inject', name: 'guice', version: '4.0'
+    compile group: 'com.google.inject', name: 'guice', version: '4.2.2'
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
 
     //SQL LAYER    
@@ -56,7 +56,7 @@ dependencies {
 // BUNDLING JAR WITH SHADOWJAR
 shadowJar {
     classifier = 'fat'
-    version = null
+    version = "$version"
     manifest {
         attributes 'Main-Class': 'io.vertx.core.Launcher'
         attributes 'Main-Verticle': 'eu.fancybrackets.template.verticle.MainVerticle'
