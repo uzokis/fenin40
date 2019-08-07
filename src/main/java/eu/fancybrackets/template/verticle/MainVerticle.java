@@ -20,10 +20,12 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.ResponseTimeHandler;
 
+import io.vertx.ext.web.handler.CorsHandler;
+
 public class MainVerticle extends AbstractVerticle {
 	Injector injector = null;
 	private final static Logger LOG = Logger.getLogger(MainVerticle.class.getName());
-	
+
 	public MainVerticle() {
 		super();
 	}
@@ -35,13 +37,17 @@ public class MainVerticle extends AbstractVerticle {
 
 		Router router = injector.getInstance(Router.class);
 		router.route().handler(ResponseTimeHandler.create());
+		router.route().handler(CorsHandler.create("*").allowedMethod(io.vertx.core.http.HttpMethod.GET)
+				.allowedMethod(io.vertx.core.http.HttpMethod.POST).allowedMethod(io.vertx.core.http.HttpMethod.OPTIONS)
+				.allowedHeader("Access-Control-Allow-Credentials").allowedHeader("Access-Control-Allow-Origin")
+				.allowedHeader("Access-Control-Allow-Headers").allowedHeader("Content-Type"));
 
 		vertx.deployVerticle(injector.getInstance(ArduinoAPIVerticle.class));
 
 		vertx.createHttpServer().requestHandler(router).listen(8080);
 
-		//disabled until db is fixed
-		//printDBVersion(injector.getInstance(DataSource.class));
+		// disabled until db is fixed
+		// printDBVersion(injector.getInstance(DataSource.class));
 	}
 
 	protected void printDBVersion(DataSource ds) {
