@@ -38,7 +38,8 @@ public class MainVerticle extends AbstractVerticle {
 
 		vertx.deployVerticle(injector.getInstance(ArduinoAPIVerticle.class));
 
-		vertx.createHttpServer().requestHandler(router).listen(8080);
+		//TODO should pbly go via config retriever
+		vertx.createHttpServer().requestHandler(router).listen(Integer.parseInt(System.getenv("PORT")));
 
 		//disabled until db is fixed
 		printDBVersion(injector.getInstance(DataSource.class));
