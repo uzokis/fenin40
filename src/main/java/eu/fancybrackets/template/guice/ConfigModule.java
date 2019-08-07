@@ -1,6 +1,5 @@
 package eu.fancybrackets.template.guice;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -18,9 +17,6 @@ import com.google.inject.Provides;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
-import io.vertx.config.ConfigRetriever;
-import io.vertx.config.ConfigRetrieverOptions;
-import io.vertx.config.ConfigStoreOptions;
 import io.vertx.core.Context;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
@@ -64,7 +60,7 @@ public class ConfigModule extends AbstractModule {
 	@Singleton
 	@Named(LOCAL_PORT)
 	public Integer getLocalPort() {
-		return config.getInteger("PORT");
+		return config.getInteger("PORT", new Integer(8080));
 	}
 
 	@Provides

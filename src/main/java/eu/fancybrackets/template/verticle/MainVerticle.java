@@ -38,9 +38,9 @@ public class MainVerticle extends AbstractVerticle {
 	public void start() throws Exception {
 		super.start();
 		
-		ConfigStoreOptions file = new ConfigStoreOptions().setType("file").setFormat("properties")
+		ConfigStoreOptions file = new ConfigStoreOptions().setType("file").setFormat("properties").setOptional(true)
 				.setConfig(new JsonObject().put("path", ".env"));
-		ConfigRetrieverOptions options = new ConfigRetrieverOptions().setIncludeDefaultStores(true).addStore(file);
+		ConfigRetrieverOptions options = new ConfigRetrieverOptions().setIncludeDefaultStores(true).addStore(file).setScanPeriod(1000*60*60*24);
 		ConfigRetriever retriever = ConfigRetriever.create(vertx, options);
 
 		vertx.executeBlocking(future-> {
