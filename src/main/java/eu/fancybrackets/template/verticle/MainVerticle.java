@@ -43,14 +43,7 @@ public class MainVerticle extends AbstractVerticle {
 		ConfigStoreOptions file = new ConfigStoreOptions().setType("file").setFormat("properties").setOptional(true)
 				.setConfig(new JsonObject().put("path", ".env"));
 		ConfigRetrieverOptions options = new ConfigRetrieverOptions().setIncludeDefaultStores(true).addStore(file).setScanPeriod(1000*60*60*24);
-		ConfigRetriever retriever = ConfigRetriever.create(vertx, options);
-
-		Router router = injector.getInstance(Router.class);
-		router.route().handler(ResponseTimeHandler.create());
-		router.route().handler(CorsHandler.create("*").allowedMethod(io.vertx.core.http.HttpMethod.GET)
-				.allowedMethod(io.vertx.core.http.HttpMethod.POST).allowedMethod(io.vertx.core.http.HttpMethod.OPTIONS)
-				.allowedHeader("Access-Control-Allow-Credentials").allowedHeader("Access-Control-Allow-Origin")
-				.allowedHeader("Access-Control-Allow-Headers").allowedHeader("Content-Type"));
+		ConfigRetriever retriever = ConfigRetriever.create(vertx, options);		
 
 		vertx.executeBlocking(future-> {
 			retriever.getConfig(ar -> {
@@ -64,6 +57,11 @@ public class MainVerticle extends AbstractVerticle {
 			injector = Guice.createInjector(new ConfigModule(vertx, (JsonObject)res.result()));
 
 			Router router = injector.getInstance(Router.class);
+			router.route().handler(ResponseTimeHandler.create());
+			router.route().handler(CorsHandler.create("*").allowedMethod(io.vertx.core.http.HttpMethod.GET)
+					.allowedMethod(io.vertx.core.http.HttpMethod.POST).allowedMethod(io.vertx.core.http.HttpMethod.OPTIONS)
+					.allowedHeader("Access-Control-Allow-Credentials").allowedHeader("Access-Control-Allow-Origin")
+					.allowedHeader("Access-Control-Allow-Headers").allowedHeader("Content-Type"));
 			router.route().handler(ResponseTimeHandler.create());
 
 			vertx.deployVerticle(injector.getInstance(ArduinoAPIVerticle.class));

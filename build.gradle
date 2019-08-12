@@ -46,6 +46,7 @@ dependencies {
     compile "org.jooq:jooq-codegen:$versions.jooq"
     compile "com.zaxxer:HikariCP:2.4.+"//ludicrous speed connection pool
     compile "org.postgresql:postgresql:9.4.+"//compatible/recommended with/for cockroach    
+    compile 'io.vertx:vertx-web-client:3.8.0'
 
     //TEST DEPENDENCIES
     testCompile group: 'org.mockito', name: 'mockito-core', version: '1.+'

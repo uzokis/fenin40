@@ -4,9 +4,9 @@
 package eu.fancybrackets.template.jooq.generated;
 
 
-import eu.fancybrackets.template.jooq.generated.tables.Measurement;
+import javax.annotation.processing.Generated;
 
-import javax.annotation.Generated;
+import eu.fancybrackets.template.jooq.generated.tables.Measurement;
 
 
 /**
