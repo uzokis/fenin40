@@ -1,5 +1,7 @@
 package eu.fancybrackets.template.handler;
 
+import static eu.fancybrackets.template.jooq.generated.tables.Measurement.MEASUREMENT;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -16,19 +18,15 @@ import javax.sql.DataSource;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import org.jooq.tools.json.JSONObject;
+
 import eu.fancybrackets.template.jooq.generated.tables.pojos.Measurement;
 import eu.fancybrackets.template.jooq.generated.tables.records.MeasurementRecord;
 import eu.fancybrackets.template.verticle.ArduinoAPIVerticle;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
-import static eu.fancybrackets.template.jooq.generated.tables.Measurement.*;
-
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
@@ -42,8 +40,39 @@ public class ArduinoAPIHandler {
 
 	@Inject
 	private DataSource ds;
+	
+	
+	private DataProcessor tank1 = new DataProcessor(1);
+	private DataProcessor tank2 = new DataProcessor(2);
+	private DataProcessor tank3 = new DataProcessor(3);
 
-	/* 
+
+	
+	/*
+	private static int entryCount;
+		
+	public static void calculateEntryCount() {
+		vertx.executeBlocking(future -> {
+			try (Connection conn = ds.getConnection()) {
+				int ec = DSL.using(conn, SQLDialect.POSTGRES).fetchCount(MEASUREMENT);
+				entryCount = ec;
+				future.complete();
+			} catch (SQLException e) {
+				future.fail(e);
+			}
+		}, future -> {
+			if (future.succeeded()) {
+				System.out.println("entry count calculated successfully");
+			} else {
+				LOG.log(Level.SEVERE, "Unexpected exception", future.cause());
+				System.out.println("failed calculating entry count");
+			}
+		});
+	}
+	*/
+	
+
+	/**
 	 *  example handler by Eli
 	 */
 	public void handleGet(RoutingContext context) {
@@ -83,7 +112,7 @@ public class ArduinoAPIHandler {
 	}
 	
 	
-	/*
+	/**
 	 * Example handler by Eli
 	 */
 	public void handlePost(RoutingContext context) {
@@ -114,7 +143,7 @@ public class ArduinoAPIHandler {
 	}
 	
 	
-	/*
+	/**
 	 * Handle the GET request from the HTML file. 
 	 * Replies with the last known data of the water levels of the 3 tanks.
 	 */
@@ -135,7 +164,10 @@ public class ArduinoAPIHandler {
 
 				JsonObject response = new JsonObject().put("bak1", m1.getValue())
 														.put("bak2" , m2.getValue())
-														.put("bak3", m3.getValue());
+														.put("bak3", m3.getValue())
+														.put("running1", tank1.intIsRunning())
+														.put("running2", tank2.intIsRunning())
+														.put("running3", tank3.intIsRunning());
 
 				future.complete(response);
 			} catch (SQLException e) {
@@ -153,7 +185,7 @@ public class ArduinoAPIHandler {
 	}
 	
 	
-	/*
+	/**
 	 * Handle POST request from the HTML file.
 	 * Starts tank 1 by sending a POST request to the Arduino.
 	 */
@@ -163,7 +195,7 @@ public class ArduinoAPIHandler {
 	}
 	
 	
-	/*
+	/**
 	 * Handle POST request from te HTML file.
 	 * Stops tank 1 by sending a POST request to the Arduino.
 	 */
@@ -173,7 +205,7 @@ public class ArduinoAPIHandler {
 	}	
 	
 	
-	/*
+	/**
 	 * Handle POST request from the HTML file.
 	 * Stops tank 2 by sending a POST request to the Arduino.
 	 */
@@ -183,7 +215,7 @@ public class ArduinoAPIHandler {
 	}
 	
 	
-	/*
+	/**
 	 * Handle POST request from the HTML file.
 	 * Stops tank 2 by sending a POST request to the Arduino.
 	 */
@@ -193,7 +225,7 @@ public class ArduinoAPIHandler {
 	}	
 	
 	
-	/*
+	/**
 	 * Handle POST request from the HTML file.
 	 * Starts tank 3 by sending a POST request to the Arduino.
 	 */
@@ -202,7 +234,7 @@ public class ArduinoAPIHandler {
 		startTank(3);
 	}
 	
-	/*
+	/**
 	 * Handle POST request from the HTML file.
 	 * Stops tank 3 by sending a POST request to the Arduino.
 	 */
@@ -211,18 +243,22 @@ public class ArduinoAPIHandler {
 		stopTank(3);
 	}	
 	
-	/*
+	/**
 	 * Handle POST request from the Arduino, containing the water levels of the 3 tanks.
 	 * Creates a new instance of the class Measurements for each tank that was given with the
 	 * POST request.
 	 */
 	public void handletWaterLevels(RoutingContext context) {
+		System.out.println("hij doet toch nog iets");
 		
-		vertx.executeBlocking(future -> {
+		vertx.executeBlocking(future -> { System.out.println("lkjsf");
 			try (Connection conn = ds.getConnection()) {
+				System.out.println("waypoint 1");
 				DSL.using(conn).transaction(configuration -> {
+					System.out.println("komt in functie");
 					LOG.info(String.format("**** Got %s", context.getBodyAsJson()));
-					
+			
+										
 					//get number of tanks that was given with the POST request
 					JsonObject jsonBody = context.getBodyAsJson();
 					Map jsonMap = jsonBody.mapTo(Map.class);
@@ -236,42 +272,67 @@ public class ArduinoAPIHandler {
 					//time stamp - attribute
 					Timestamp time = new Timestamp(new Date().getTime());
 					
+					//delete the 2000 oldest entries if the entry count is more than 7000 entries.
+					int entryCount = DSL.using(conn).fetchCount(MEASUREMENT);
+					System.out.println("entry count: " + entryCount);
+					if (entryCount > 7000) {
+						int id = DSL.using(conn, SQLDialect.POSTGRES).selectFrom(MEASUREMENT).orderBy(MEASUREMENT.MEASURE_TIME.desc()).fetchAny().get(MEASUREMENT.ID);
+						String condition = "MEASUREMENT.ID < " + Integer.toString(id) + " - 5000";
+						DSL.using(conn, SQLDialect.POSTGRES).deleteFrom(MEASUREMENT).where(condition).execute();
+					}
+					
+					
 					//iterate over all the given keys ( options: tank 1, tank 2 , tank 3)
 					// 	create instance of the class Measurement for each given tank
 					// 	add container id, value and time stamp to each instance
 					for (String i : keys) {
-						System.out.println("komt in forloop");
 						
-						Measurement m = new Measurement();
 						String containerId = Character.toString(i.charAt(3));
-						m.setContainerId(containerId);
+						DataProcessor tank = selectTank(containerId);
 						String key = "bak" + containerId;
-						m.setValue(context.getBodyAsJson().getString(key));
-						m.setMeasureTime(time);
-						MeasurementRecord mr = DSL.using(configuration).newRecord(MEASUREMENT, m);
-						mr.store();
-						future.complete();
+						String value = context.getBodyAsJson().getString(key);
+						float smoothedValue = tank.SmoothenData(Float.parseFloat(value));
+						
+						if (smoothedValue == -1) {
+							stopTank(Integer.parseInt(containerId));
+						} else {
+							Measurement m = new Measurement();
+							m.setContainerId(containerId);
+							m.setValue(Float.toString(smoothedValue));
+							m.setMeasureTime(time);
+							MeasurementRecord mr = DSL.using(configuration).newRecord(MEASUREMENT, m);
+							int result = mr.store();
+						}
+						//System.out.println("stored: " + result);
+						System.out.println("tank" + containerId + ": " + smoothedValue); 
+						
 					}
+					
+					future.complete();
 
 				});
-			} catch (SQLException e) {
+			} catch (Exception e) {
+				System.out.println("sqlException: " + e);
 				future.fail(e);
 			}
 		}, future -> {
 			if (future.succeeded()) {
+				System.out.println("succeeded");
 				context.response().setStatusCode(201).end();
 			} else {
+				System.out.println("failed: " + future.cause());
 				context.response().setStatusCode(500).end();
 			}
 		});
+		System.out.println("komt op einde functie");
 	}
 	
-	/*
+	/**
 	 * request to make 
 	 */
 	private HttpRequest<Buffer> request;
 	
-	/*
+	/**
 	 * Stop specified tank by sending a POST request to the Arduino.
 	 * 
 	 * @argument tankNb : integer specifying which tank to stop (tank 1, 2 or 3).
@@ -305,9 +366,11 @@ public class ArduinoAPIHandler {
 				System.out.println("mislukt: " + ar.cause().getMessage());
 			}
 			});
+		DataProcessor tankToStop = selectTank(Integer.toString(tankNb));
+		tankToStop.setIdle();
 	}
 	
-	/*
+	/**
 	 * Start specified tank by sending a POST request to the Arduino.
 	 * 
 	 * @argument tankNb : integer specifying which tank to start (tank 1, 2 or 3).
@@ -337,5 +400,21 @@ public class ArduinoAPIHandler {
 			if (ar.succeeded()) {
 			    // Ok
 			}});
+		DataProcessor tankToStart = selectTank(Integer.toString(tankNb));
+		tankToStart.setRunning();
 	}
+	
+	
+	private DataProcessor selectTank(String tankNb) {
+		if (tankNb.equalsIgnoreCase("1")) {
+			return tank1;
+		}
+		else if (tankNb.equalsIgnoreCase("2")) {
+			return tank2;
+		}
+		else {
+			return tank3;
+		}
+	}
+	
 }

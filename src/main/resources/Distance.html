@@ -11,6 +11,7 @@
             border: none;
             border-radius: 15px;
             /*box-shadow: 0 9px #999;*/
+
         }
 
         .buttonstyle:hover {text-}
@@ -20,6 +21,27 @@
             box-shadow:0 5px #666;
             transform: translateY(4px);
         }
+
+        .container {
+            width: 570px;
+            height: 100px;
+            padding: 10px;
+            /*justify-content: space-between;
+            align-content: space-between;*/
+            margin: auto;
+        }
+
+        .grid {
+          display: grid;
+          grid-template-columns: 190px 190px 190px;
+          grid-template-rows: 50px 50 ;
+        }
+
+        .chart {
+            margin: auto;
+        }
+
+
     </style>
 </head>
 <body align="center">       
@@ -37,6 +59,10 @@
 
     var dataSheet = [[0, 0, 0, 0, 0],[0, 0, 0, 0, 0],[0, 0, 0, 0, 0]];
 
+    var tank1Running = 0;
+    var tank2Running = 0;
+    var tank3Running = 0;
+
 
     function fillDataSheet() {
         //getJSON('http://192.168.43.4:48964/status',
@@ -51,8 +77,46 @@
                     dataSheet[1].push(data.bak2);
                     dataSheet[2].shift();
                     dataSheet[2].push(data.bak3);
+
+                    tank1Running = data.running1;
+                    tank2Running = data.running2;
+                    tank3Running = data.running3;
+                    setButtons();
                 }
             });
+    }
+
+    function setButtons() {
+        if (tank1Running == 1) {
+            document.getElementById("buttonTank1").value = "STOP";
+            tank1Status = "on";
+            document.getElementById("infoTank1").innerHTML = "running";
+        } else if (tank1Running == 0) {
+            document.getElementById("buttonTank1").value = "START";
+            tank1Status = "off";
+            document.getElementById("infoTank1").innerHTML = "idle";
+        }
+
+        if (tank2Running == 1) {
+            document.getElementById("buttonTank2").value = "STOP";
+            tank2Status = "on";
+            document.getElementById("infoTank2").innerHTML = "running";
+        } else if (tank2Running == 0) {
+            document.getElementById("buttonTank2").value = "START";
+            tank2Status = "off";
+            document.getElementById("infoTank2").innerHTML = "idle";
+        }
+
+        if (tank3Running == 1) {
+            document.getElementById("buttonTank3").value = "STOP";
+            tank3Status = "on";
+            document.getElementById("infoTank3").innerHTML = "running";
+        } else if (tank3Running == 0) {
+            document.getElementById("buttonTank3").value = "START";
+            tank3Status = "off";
+            document.getElementById("infoTank3").innerHTML = "idle";
+        }
+
     }
 
     function draw() {
@@ -143,12 +207,14 @@
             tank1Status = "on";
             var path = '/START';
             var params = "tank1";
+            document.getElementById("infoTank1").innerHTML = "turning on ...";
         }
         else {
             document.getElementById("buttonTank1").value = "START";
             tank1Status = "off";           
             var path = '/STOP';
             var params = "tank1";
+            document.getElementById("infoTank1").innerHTML = "turning off ...";
         }
         var url = address + path + tankId;
         postRequest.open('POST', url, true);
@@ -163,12 +229,14 @@
             tank2Status = "on";
             var path = '/START';
             var params = "tank2";
+            document.getElementById("infoTank2").innerHTML = "turning on ...";
         }
         else {
             document.getElementById("buttonTank2").value = "START";
             tank2Status = "off";
             var path = '/STOP';
             var params = 'tank2';
+            document.getElementById("infoTank2").innerHTML = "turning off ...";
         }
         var url = address + path + tankId;
         postRequest.open('POST', url, true);
@@ -182,13 +250,15 @@
             document.getElementById("buttonTank3").value = "STOP";
             tank3Status = "on";
             var path = '/START';
-            var params = "tank3"
+            var params = "tank3";
+            document.getElementById("infoTank3").innerHTML = "turning on ...";
         }
         else {
             document.getElementById("buttonTank3").value = "START";
             tank3Status = "off";
             var path = '/STOP';
             var params = 'tank3';
+            document.getElementById("infoTank3").innerHTML = "turning off ...";
         }
         url = address + path + tankId;
         postRequest.open('POST', url, true);
@@ -198,13 +268,21 @@
 </script>
 <h1 align="center" style="font-family:Nanum Gothic, sans-serif" >Water levels</h1>
 
-<div id="chart" align="center"></div>
+<div class = "chart" id="chart" align="center"></div>
 
-<input type="button" class="buttonstyle" id="buttonTank1" style="background-color: #C4DFE6;color: black;width: 160px;height: 50px; margin-right: 15px;margin-left: 150px; border-radius: 5px;"onclick="startStopBak1()" value="START"></button>
+<div class="container grid" align="center">
+    <input type="button" class="buttonstyle" id="buttonTank1" style="background-color: #C4DFE6;color: black;width: 160px;height: 50px; margin-right: 15px;margin-left: 15px; border-radius: 5px;"onclick="startStopBak1()" value="START"></button>
 
-<input type="button" class="buttonstyle" id="buttonTank2" style="background-color: #66A5AD;color: black;width: 160px;height: 50px; margin-right: 15px;margin-left: 15px; margin-right: 15px; border-radius: 5px;"onclick="startStopBak2()" value="START"></button>
+    <input type="button" class="buttonstyle" id="buttonTank2" style="background-color: #66A5AD;color: black;width: 160px;height: 50px; margin-right: 15px;margin-left: 15px;  border-radius: 5px;"onclick="startStopBak2()" value="START"></button>
 
-<input type="button" class="buttonstyle" id="buttonTank3" style="background-color: #07575B;color: white;width: 160px; height: 50px; margin-left: 15px;margin-right: 150px; border-radius: 5px;"onclick="startStopBak3()" value="START"></button>
+    <input type="button" class="buttonstyle" id="buttonTank3" style="background-color: #07575B;color: white;width: 160px; height: 50px; margin-left: 15px;margin-right: 15px; border-radius: 5px;"onclick="startStopBak3()" value="START"></button>
+
+    <p id="infoTank1" style=" font-family:Nanum Gothic, sans-serif; text-align:center; float: left; width: 160px; margin-right: 15px; margin-left: 15px" ></p>
+
+    <p id="infoTank2" style=" font-family:Nanum Gothic, sans-serif; text-align:center; float: left; width: 160px; margin-right: 15px; margin-left: 15px" ></p>
+
+    <p id="infoTank3"  style=" font-family:Nanum Gothic, sans-serif; text-align:center; float: left; width: 160px; margin-right: 15px; margin-left: 15px" ></p>
+</div>
 
 <p id="demo"></p>
 </body>

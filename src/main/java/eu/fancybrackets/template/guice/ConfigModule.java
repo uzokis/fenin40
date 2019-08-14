@@ -76,6 +76,7 @@ public class ConfigModule extends AbstractModule {
 		config.addDataSourceProperty("sslmode", "require"); // required for heroku
 		config.setUsername(username);
 		config.setPassword(password);
+		config.setConnectionTimeout(20*1000);
 
 		HikariDataSource ds = new HikariDataSource(config);
 		return ds;
