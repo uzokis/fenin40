@@ -26,6 +26,9 @@ public class ArduinoAPIVerticle extends AbstractVerticle {
 		this.router.route(String.format("/api/:%s",API_PARAM_CONTAINER_ID)).method(HttpMethod.GET).handler(arduinoAPIHandler::handleGet);
 		this.router.route(String.format("/api/:%s",API_PARAM_CONTAINER_ID)).method(HttpMethod.POST).handler(arduinoAPIHandler::handlePost);
 		
+		this.router.route("/htmlFile").method(HttpMethod.GET)
+		.handler(arduinoAPIHandler::handleHTMLFile);
+		
 		//handle GET request from html file
 		this.router.route("/browser/data").method(HttpMethod.GET)
 		.handler(arduinoAPIHandler::handleGetDataHTML);

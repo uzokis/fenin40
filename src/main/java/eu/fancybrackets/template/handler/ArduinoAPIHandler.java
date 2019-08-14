@@ -2,15 +2,20 @@ package eu.fancybrackets.template.handler;
 
 import static eu.fancybrackets.template.jooq.generated.tables.Measurement.MEASUREMENT;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.sql.DataSource;
@@ -25,6 +30,7 @@ import eu.fancybrackets.template.verticle.ArduinoAPIVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.client.HttpRequest;
@@ -72,6 +78,26 @@ public class ArduinoAPIHandler {
 	*/
 	
 
+	public void handleHTMLFile(RoutingContext context) {
+		vertx.executeBlocking(future -> {
+				HttpServerResponse response = context.response();
+				response
+	            .putHeader("content-type", "text/html")
+	            .sendFile("/src/main/resources/Distance.html");
+				
+				future.complete();
+		
+	}, future -> {
+		if (future.succeeded()) {
+			context.response().setChunked(true);
+			context.response().write(future.result().toString()).end();
+		} else {
+			LOG.log(Level.SEVERE, "Unexpected exception", future.cause());
+			context.response().setStatusCode(500).end();
+		}
+	});
+	}
+	
 	/**
 	 *  example handler by Eli
 	 */

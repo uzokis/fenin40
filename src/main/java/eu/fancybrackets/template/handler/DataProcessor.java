@@ -33,7 +33,7 @@ public class DataProcessor {
 	/**
 	 * 
 	 */
-	private final float minLevel = 30;
+	private final float minLevel = 10;
 	
 	/**
 	 * 
