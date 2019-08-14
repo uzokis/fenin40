@@ -4,7 +4,7 @@
 package eu.fancybrackets.template.jooq.generated;
 
 
-import javax.annotation.processing.Generated;
+import javax.annotation.Generated;
 
 import org.jooq.Sequence;
 import org.jooq.impl.SequenceImpl;

@@ -7,7 +7,7 @@ package eu.fancybrackets.template.jooq.generated.tables.pojos;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
-import javax.annotation.processing.Generated;
+import javax.annotation.Generated;
 
 
 /**

@@ -7,7 +7,7 @@ package eu.fancybrackets.template.jooq.generated;
 import eu.fancybrackets.template.jooq.generated.tables.Measurement;
 import eu.fancybrackets.template.jooq.generated.tables.records.MeasurementRecord;
 
-import javax.annotation.processing.Generated;
+import javax.annotation.Generated;
 
 import org.jooq.Identity;
 import org.jooq.UniqueKey;
