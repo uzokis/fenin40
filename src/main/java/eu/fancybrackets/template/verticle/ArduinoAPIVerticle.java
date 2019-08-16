@@ -51,6 +51,21 @@ public class ArduinoAPIVerticle extends AbstractVerticle {
 		this.router.route("/browser/START/tank1").method(HttpMethod.POST)
 			.handler(arduinoAPIHandler::handlePostStart1);
 		
+		this.router.route("/browser/STOP/tank1").method(HttpMethod.POST)
+		.handler(arduinoAPIHandler::handlePostStop1);
+		
+		this.router.route("/browser/START/tank2").method(HttpMethod.POST)
+		.handler(arduinoAPIHandler::handlePostStart2);
+		
+		this.router.route("/browser/STOP/tank2").method(HttpMethod.POST)
+		.handler(arduinoAPIHandler::handlePostStop2);
+		
+		this.router.route("/browser/START/tank3").method(HttpMethod.POST)
+		.handler(arduinoAPIHandler::handlePostStart3);
+		
+		this.router.route("/browser/STOP/tank3").method(HttpMethod.POST)
+		.handler(arduinoAPIHandler::handlePostStop3);
+		
 		// 
 		//requests from and to arduino:
 		//

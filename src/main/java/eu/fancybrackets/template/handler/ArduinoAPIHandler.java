@@ -295,6 +295,51 @@ public class ArduinoAPIHandler {
 	}
 	
 	/**
+	 * 
+	 * @param context
+	 */
+	public void handlePostStop1(RoutingContext context) {
+		System.out.println("stop 1");
+		stopTank(1, context);
+	}
+	
+	/**
+	 * 
+	 * @param context
+	 */
+	public void handlePostStart2(RoutingContext context) {
+		System.out.println("start 2");
+		startTank(2, context);
+	}
+	
+	/**
+	 * 
+	 * @param context
+	 */
+	public void handlePostStop2(RoutingContext context) {
+		System.out.println("stop 2");
+		stopTank(2, context);
+	}
+	
+	/**
+	 * 
+	 * @param context
+	 */
+	public void handlePostStart3(RoutingContext context) {
+		System.out.println("start 3");
+		startTank(3, context);
+	}
+	
+	/**
+	 * 
+	 * @param context
+	 */
+	public void handlePostStop3(RoutingContext context) {
+		System.out.println("stop 3");
+		stopTank(3, context);
+	}
+	
+	/**
 	 * Handle POST request from the Arduino, containing the water levels of the 3 tanks.
 	 * Creates a new instance of the class Measurements for each tank that was given with the
 	 * POST request.
