@@ -51,6 +51,9 @@ public class ArduinoAPIHandler {
 	private DataProcessor tank1 = new DataProcessor(1);
 	private DataProcessor tank2 = new DataProcessor(2);
 	private DataProcessor tank3 = new DataProcessor(3);
+	
+	int start = 0;
+	int stop = 0;
 
 
 	
@@ -126,17 +129,15 @@ public class ArduinoAPIHandler {
 		});
 	}
 	
-	int i = 0;
 	
 	public void handleStartStopTank3(RoutingContext context) {
 		vertx.executeBlocking(future -> {
 			try (Connection conn = ds.getConnection()) {
-				i++;
 				String response;
 				if (tank3.intIsRunning() == 1) {
-					response = "STARdrie" + i;
+					response = "STARdrie" + start + "," + stop;
 				} else {
-					response = "STOPdrie" + i;
+					response = "STOPdrie" + start + "," + stop;
 				}
 				
 				future.complete(response);
@@ -329,6 +330,7 @@ public class ArduinoAPIHandler {
 	 * @param context
 	 */
 	public void handlePostStart3(RoutingContext context) {
+		start++;
 		System.out.println("start 3");
 		startTank(3, context);
 	}
@@ -338,6 +340,7 @@ public class ArduinoAPIHandler {
 	 * @param context
 	 */
 	public void handlePostStop3(RoutingContext context) {
+		stop++;
 		System.out.println("stop 3");
 		stopTank(3, context);
 	}
