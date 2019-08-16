@@ -1,5 +1,6 @@
 package eu.fancybrackets.template.handler;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -117,6 +118,12 @@ public class DataProcessor {
 		if (waterlevel < this.minLevel) {
 			if (this.checkUnderMinLevel()) {
 				this.setStopped();
+				try {
+					Runtime.getRuntime().exec("python IntershopBestellingPlaatsen.py");
+				} catch (IOException e) {
+					System.out.println("Exception from putting order: " + e);
+					e.printStackTrace();
+				}
 				return -1;
 			}
 		}
