@@ -437,37 +437,7 @@ public class ArduinoAPIHandler {
 	 * value is "eeen" if tankNb equals 1, "twee" if tankNb equals 2, and "drie" if 
 	 * the tankNb equals 3.
 	 */
-	private void stopTank(int tankNb, RoutingContext context) throws IllegalArgumentException {
-		
-		vertx.executeBlocking(future -> {
-			try (Connection conn = ds.getConnection()) {
-				String response = "STOP";
-				
-				if (tankNb == 1) {
-					response = response + "eeen";
-				}
-				else if (tankNb == 2) {
-					response = response + "twee";
-				}
-				else if (tankNb == 3) {
-					response = response + "drie";
-				}
-				else {
-					throw new IllegalArgumentException("Invalid tankNb");
-				}
-				future.complete(response);
-			} catch (SQLException e) {
-				future.fail(e);
-			}
-		}, future -> {
-			if (future.succeeded()) {
-				context.response().setChunked(true);
-				context.response().write(future.result().toString()).end();
-			} else {
-				LOG.log(Level.SEVERE, "Unexpected exception", future.cause());
-				context.response().setStatusCode(500).end();
-			}
-		});
+	private void stopTank(int tankNb, RoutingContext context) {
 		DataProcessor tankToStop = selectTank(Integer.toString(tankNb));
 		tankToStop.setIdle();
 	}
@@ -482,38 +452,8 @@ public class ArduinoAPIHandler {
 	 * the tankNb equals 3.
 	 */
 	private void startTank(int tankNb, RoutingContext context) {
-		
-		vertx.executeBlocking(future -> {
-			try (Connection conn = ds.getConnection()) {
-				String response = "STAR";
-				
-				if (tankNb == 1) {
-					response = response + "eeen";
-				}
-				else if (tankNb == 2) {
-					response = response + "twee";
-				}
-				else if (tankNb == 3) {
-					response = response + "drie";
-				}
-				else {
-					throw new IllegalArgumentException("Invalid tankNb");
-				}
-				future.complete(response);
-			} catch (SQLException e) {
-				future.fail(e);
-			}
-		}, future -> {
-			if (future.succeeded()) {
-				context.response().setChunked(true);
-				context.response().write(future.result().toString()).end();
-			} else {
-				LOG.log(Level.SEVERE, "Unexpected exception", future.cause());
-				context.response().setStatusCode(500).end();
-			}
-		});
-		DataProcessor tankToStop = selectTank(Integer.toString(tankNb));
-		tankToStop.setRunning();
+		DataProcessor tankToStart = selectTank(Integer.toString(tankNb));
+		tankToStart.setRunning();
 	}
 	
 	
