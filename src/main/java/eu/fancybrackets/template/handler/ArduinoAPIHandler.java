@@ -126,14 +126,17 @@ public class ArduinoAPIHandler {
 		});
 	}
 	
+	int i = 0;
+	
 	public void handleStartStopTank3(RoutingContext context) {
 		vertx.executeBlocking(future -> {
 			try (Connection conn = ds.getConnection()) {
+				i++;
 				String response;
 				if (tank3.intIsRunning() == 1) {
-					response = "STARdrie";
+					response = "STARdrie" + i;
 				} else {
-					response = "STOPdrie";
+					response = "STOPdrie" + i;
 				}
 				
 				future.complete(response);
