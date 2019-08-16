@@ -307,7 +307,7 @@ public class ArduinoAPIHandler {
 		}, future -> {
 			if (future.succeeded()) {
 				context.response().setChunked(true);
-				context.response().write(future.result().toString()).end();
+				context.response().setStatusCode(200).end();
 			} else {
 				LOG.log(Level.SEVERE, "Unexpected exception", future.cause());
 				context.response().setStatusCode(500).end();
@@ -333,7 +333,7 @@ public class ArduinoAPIHandler {
 		}, future -> {
 			if (future.succeeded()) {
 				context.response().setChunked(true);
-				context.response().write(future.result().toString()).end();
+				context.response().setStatusCode(200).end();
 			} else {
 				LOG.log(Level.SEVERE, "Unexpected exception", future.cause());
 				context.response().setStatusCode(500).end();
@@ -359,7 +359,7 @@ public class ArduinoAPIHandler {
 		}, future -> {
 			if (future.succeeded()) {
 				context.response().setChunked(true);
-				context.response().write(future.result().toString()).end();
+				context.response().setStatusCode(200).end();
 			} else {
 				LOG.log(Level.SEVERE, "Unexpected exception", future.cause());
 				context.response().setStatusCode(500).end();
@@ -384,7 +384,7 @@ public class ArduinoAPIHandler {
 		}, future -> {
 			if (future.succeeded()) {
 				context.response().setChunked(true);
-				context.response().write(future.result().toString()).end();
+				context.response().setStatusCode(200).end();
 			} else {
 				LOG.log(Level.SEVERE, "Unexpected exception", future.cause());
 				context.response().setStatusCode(500).end();
@@ -410,7 +410,7 @@ public class ArduinoAPIHandler {
 		}, future -> {
 			if (future.succeeded()) {
 				context.response().setChunked(true);
-				context.response().write(future.result().toString()).end();
+				context.response().setStatusCode(200).end();
 			} else {
 				LOG.log(Level.SEVERE, "Unexpected exception", future.cause());
 				context.response().setStatusCode(500).end();
@@ -437,7 +437,7 @@ public class ArduinoAPIHandler {
 		}, future -> {
 			if (future.succeeded()) {
 				context.response().setChunked(true);
-				context.response().write(future.result().toString()).end();
+				context.response().setStatusCode(200).end();
 			} else {
 				LOG.log(Level.SEVERE, "Unexpected exception", future.cause());
 				context.response().setStatusCode(500).end();
