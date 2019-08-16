@@ -76,7 +76,80 @@ public class ArduinoAPIHandler {
 		});
 	}
 	*/
+	public void handleStartStopTank1(RoutingContext context) {
+		vertx.executeBlocking(future -> {
+			try (Connection conn = ds.getConnection()) {
+				String response;
+				if (tank1.intIsRunning() == 1) {
+					response = "STAReeen";
+				} else {
+					response = "STOPeeen";
+				}
+				
+				future.complete(response);
+			} catch (SQLException e) {
+				future.fail(e);
+			}
+		}, future -> {
+			if (future.succeeded()) {
+				context.response().setChunked(true);
+				context.response().write(future.result().toString()).end();
+			} else {
+				LOG.log(Level.SEVERE, "Unexpected exception", future.cause());
+				context.response().setStatusCode(500).end();
+			}
+		});
+	}
 	
+	public void handleStartStopTank2(RoutingContext context) {
+		vertx.executeBlocking(future -> {
+			try (Connection conn = ds.getConnection()) {
+				String response;
+				if (tank2.intIsRunning() == 1) {
+					response = "STARtwee";
+				} else {
+					response = "STOPtwee";
+				}
+				
+				future.complete(response);
+			} catch (SQLException e) {
+				future.fail(e);
+			}
+		}, future -> {
+			if (future.succeeded()) {
+				context.response().setChunked(true);
+				context.response().write(future.result().toString()).end();
+			} else {
+				LOG.log(Level.SEVERE, "Unexpected exception", future.cause());
+				context.response().setStatusCode(500).end();
+			}
+		});
+	}
+	
+	public void handleStartStopTank3(RoutingContext context) {
+		vertx.executeBlocking(future -> {
+			try (Connection conn = ds.getConnection()) {
+				String response;
+				if (tank3.intIsRunning() == 1) {
+					response = "STARdrie";
+				} else {
+					response = "STOPdrie";
+				}
+				
+				future.complete(response);
+			} catch (SQLException e) {
+				future.fail(e);
+			}
+		}, future -> {
+			if (future.succeeded()) {
+				context.response().setChunked(true);
+				context.response().write(future.result().toString()).end();
+			} else {
+				LOG.log(Level.SEVERE, "Unexpected exception", future.cause());
+				context.response().setStatusCode(500).end();
+			}
+		});
+	}
 
 	public void handleHTMLFile(RoutingContext context) {
 		vertx.executeBlocking(future -> {
@@ -213,61 +286,13 @@ public class ArduinoAPIHandler {
 	
 	/**
 	 * Handle POST request from the HTML file.
-	 * Starts tank 1 by sending a POST request to the Arduino.
+	 * Starts tank 1 by answering the next GET request from the Arduino with
+	 * "STAReeen".
 	 */
 	public void handlePostStart1(RoutingContext context) {
 		System.out.println("start 1");
-		startTank(1);
+		startTank(1, context);
 	}
-	
-	
-	/**
-	 * Handle POST request from te HTML file.
-	 * Stops tank 1 by sending a POST request to the Arduino.
-	 */
-	public void handlePostStop1(RoutingContext context) {
-		System.out.println("stop 1");
-		stopTank(1);
-	}	
-	
-	
-	/**
-	 * Handle POST request from the HTML file.
-	 * Stops tank 2 by sending a POST request to the Arduino.
-	 */
-	public void handlePostStart2(RoutingContext context) {
-		System.out.println("start 2");
-		startTank(2);
-	}
-	
-	
-	/**
-	 * Handle POST request from the HTML file.
-	 * Stops tank 2 by sending a POST request to the Arduino.
-	 */
-	public void handlePostStop2(RoutingContext context) {
-		System.out.println("stop 2");
-		stopTank(2);
-	}	
-	
-	
-	/**
-	 * Handle POST request from the HTML file.
-	 * Starts tank 3 by sending a POST request to the Arduino.
-	 */
-	public void handlePostStart3(RoutingContext context) {
-		System.out.println("start 3");
-		startTank(3);
-	}
-	
-	/**
-	 * Handle POST request from the HTML file.
-	 * Stops tank 3 by sending a POST request to the Arduino.
-	 */
-	public void handlePostStop3(RoutingContext context) {
-		System.out.println("stop 3");
-		stopTank(3);
-	}	
 	
 	/**
 	 * Handle POST request from the Arduino, containing the water levels of the 3 tanks.
@@ -320,7 +345,7 @@ public class ArduinoAPIHandler {
 						float smoothedValue = tank.SmoothenData(Float.parseFloat(value));
 						
 						if (smoothedValue == -1) {
-							stopTank(Integer.parseInt(containerId));
+							tank.setIdle();
 						} else {
 							Measurement m = new Measurement();
 							m.setContainerId(containerId);
@@ -367,31 +392,37 @@ public class ArduinoAPIHandler {
 	 * value is "eeen" if tankNb equals 1, "twee" if tankNb equals 2, and "drie" if 
 	 * the tankNb equals 3.
 	 */
-	private void stopTank(int tankNb) {
-		request = WebClient.create(vertx)
-				.post(48964, "192.168.43.4", "/onoff");
+	private void stopTank(int tankNb, RoutingContext context) throws IllegalArgumentException {
 		
-		String tank;
-		if (tankNb == 1) {
-			tank = "eeen";
-		} else if (tankNb == 2) {
-			tank = "twee";
-		} else if (tankNb ==  3) {
-			tank = "drie";
-		} else {
-			tank = "invalid number";
-		}
-		
-		JsonObject resp = new JsonObject().put("STOP", tank);
-
-		request.sendJson(resp, ar -> {
-			if (ar.succeeded()) {
-			    AsyncResult<HttpResponse<Buffer>> response = ar;
-			    System.out.println(response);
-			} else {
-				System.out.println("mislukt: " + ar.cause().getMessage());
+		vertx.executeBlocking(future -> {
+			try (Connection conn = ds.getConnection()) {
+				String response = "STOP";
+				
+				if (tankNb == 1) {
+					response = response + "eeen";
+				}
+				else if (tankNb == 2) {
+					response = response + "twee";
+				}
+				else if (tankNb == 3) {
+					response = response + "drie";
+				}
+				else {
+					throw new IllegalArgumentException("Invalid tankNb");
+				}
+				future.complete(response);
+			} catch (SQLException e) {
+				future.fail(e);
 			}
-			});
+		}, future -> {
+			if (future.succeeded()) {
+				context.response().setChunked(true);
+				context.response().write(future.result().toString()).end();
+			} else {
+				LOG.log(Level.SEVERE, "Unexpected exception", future.cause());
+				context.response().setStatusCode(500).end();
+			}
+		});
 		DataProcessor tankToStop = selectTank(Integer.toString(tankNb));
 		tankToStop.setIdle();
 	}
@@ -405,29 +436,39 @@ public class ArduinoAPIHandler {
 	 * value is "eeen" if tankNb equals 1, "twee" if tankNb equals 2, and "drie" if 
 	 * the tankNb equals 3.
 	 */
-	private void startTank(int tankNb) {
-		request = WebClient.create(vertx)
-				.post(48964, "192.168.43.4", "/onoff");
-		String tank;
-		if (tankNb == 1) {
-			tank = "eeen";
-		} else if (tankNb == 2) {
-			tank = "twee";
-		} else if (tankNb ==  3) {
-			tank = "drie";
-		} else {
-			tank = "invalid number";
-		}
+	private void startTank(int tankNb, RoutingContext context) {
 		
-		JsonObject resp = new JsonObject().put("STAR", tank);
-		System.out.println(resp);
-		
-		request.sendJson(resp, ar -> {
-			if (ar.succeeded()) {
-			    // Ok
-			}});
-		DataProcessor tankToStart = selectTank(Integer.toString(tankNb));
-		tankToStart.setRunning();
+		vertx.executeBlocking(future -> {
+			try (Connection conn = ds.getConnection()) {
+				String response = "STAR";
+				
+				if (tankNb == 1) {
+					response = response + "eeen";
+				}
+				else if (tankNb == 2) {
+					response = response + "twee";
+				}
+				else if (tankNb == 3) {
+					response = response + "drie";
+				}
+				else {
+					throw new IllegalArgumentException("Invalid tankNb");
+				}
+				future.complete(response);
+			} catch (SQLException e) {
+				future.fail(e);
+			}
+		}, future -> {
+			if (future.succeeded()) {
+				context.response().setChunked(true);
+				context.response().write(future.result().toString()).end();
+			} else {
+				LOG.log(Level.SEVERE, "Unexpected exception", future.cause());
+				context.response().setStatusCode(500).end();
+			}
+		});
+		DataProcessor tankToStop = selectTank(Integer.toString(tankNb));
+		tankToStop.setRunning();
 	}
 	
 	

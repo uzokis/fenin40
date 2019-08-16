@@ -33,6 +33,15 @@ public class ArduinoAPIVerticle extends AbstractVerticle {
 		this.router.route("/browser/data").method(HttpMethod.GET)
 		.handler(arduinoAPIHandler::handleGetDataHTML);
 		
+		this.router.route("/arduino/startstop/tank1").method(HttpMethod.GET)
+		.handler(arduinoAPIHandler::handleStartStopTank1);
+		
+		this.router.route("/arduino/startstop/tank2").method(HttpMethod.GET)
+		.handler(arduinoAPIHandler::handleStartStopTank2);
+		
+		this.router.route("/arduino/startstop/tank3").method(HttpMethod.GET)
+		.handler(arduinoAPIHandler::handleStartStopTank3);
+		
 		//
 		//request from html file:
 		//
@@ -41,31 +50,6 @@ public class ArduinoAPIVerticle extends AbstractVerticle {
 		//	start tank 1 
 		this.router.route("/browser/START/tank1").method(HttpMethod.POST)
 			.handler(arduinoAPIHandler::handlePostStart1);
-		
-		//handle POST request from html file:
-		//	stop tank 1
-		this.router.route("/browser/STOP/tank1").method(HttpMethod.POST)
-			.handler(arduinoAPIHandler::handlePostStop1);
-		
-		//handle POST request from html file:
-		//	start tank 2
-		this.router.route("/browser/START/tank2").method(HttpMethod.POST)
-			.handler(arduinoAPIHandler::handlePostStart2);
-		
-		//handle POST request from html file:
-		//	stop tank 2
-		this.router.route("/browser/STOP/tank2").method(HttpMethod.POST)
-			.handler(arduinoAPIHandler::handlePostStop2);
-		
-		//handle POST request from html file:
-		//	start tank 3
-		this.router.route("/browser/START/tank3").method(HttpMethod.POST)
-			.handler(arduinoAPIHandler::handlePostStart3);
-	
-		//handle POST request from html file:
-		//	stop tank 3
-		this.router.route("/browser/STOP/tank3").method(HttpMethod.POST)
-			.handler(arduinoAPIHandler::handlePostStop3);
 		
 		// 
 		//requests from and to arduino:
