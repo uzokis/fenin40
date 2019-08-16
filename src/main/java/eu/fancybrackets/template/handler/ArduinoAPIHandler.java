@@ -296,6 +296,23 @@ public class ArduinoAPIHandler {
 	public void handlePostStart1(RoutingContext context) {
 		System.out.println("start 1");
 		startTank(1, context);
+		
+		vertx.executeBlocking(future -> {
+			try (Connection conn = ds.getConnection()) {
+
+				future.complete();
+			} catch (SQLException e) {
+				future.fail(e);
+			}
+		}, future -> {
+			if (future.succeeded()) {
+				context.response().setChunked(true);
+				context.response().write(future.result().toString()).end();
+			} else {
+				LOG.log(Level.SEVERE, "Unexpected exception", future.cause());
+				context.response().setStatusCode(500).end();
+			}
+		});
 	}
 	
 	/**
@@ -305,6 +322,23 @@ public class ArduinoAPIHandler {
 	public void handlePostStop1(RoutingContext context) {
 		System.out.println("stop 1");
 		stopTank(1, context);
+		
+		vertx.executeBlocking(future -> {
+			try (Connection conn = ds.getConnection()) {
+
+				future.complete();
+			} catch (SQLException e) {
+				future.fail(e);
+			}
+		}, future -> {
+			if (future.succeeded()) {
+				context.response().setChunked(true);
+				context.response().write(future.result().toString()).end();
+			} else {
+				LOG.log(Level.SEVERE, "Unexpected exception", future.cause());
+				context.response().setStatusCode(500).end();
+			}
+		});
 	}
 	
 	/**
@@ -314,6 +348,23 @@ public class ArduinoAPIHandler {
 	public void handlePostStart2(RoutingContext context) {
 		System.out.println("start 2");
 		startTank(2, context);
+		
+		vertx.executeBlocking(future -> {
+			try (Connection conn = ds.getConnection()) {
+
+				future.complete();
+			} catch (SQLException e) {
+				future.fail(e);
+			}
+		}, future -> {
+			if (future.succeeded()) {
+				context.response().setChunked(true);
+				context.response().write(future.result().toString()).end();
+			} else {
+				LOG.log(Level.SEVERE, "Unexpected exception", future.cause());
+				context.response().setStatusCode(500).end();
+			}
+		});
 	}
 	
 	/**
@@ -323,6 +374,22 @@ public class ArduinoAPIHandler {
 	public void handlePostStop2(RoutingContext context) {
 		System.out.println("stop 2");
 		stopTank(2, context);
+		vertx.executeBlocking(future -> {
+			try (Connection conn = ds.getConnection()) {
+
+				future.complete();
+			} catch (SQLException e) {
+				future.fail(e);
+			}
+		}, future -> {
+			if (future.succeeded()) {
+				context.response().setChunked(true);
+				context.response().write(future.result().toString()).end();
+			} else {
+				LOG.log(Level.SEVERE, "Unexpected exception", future.cause());
+				context.response().setStatusCode(500).end();
+			}
+		});
 	}
 	
 	/**
@@ -333,6 +400,22 @@ public class ArduinoAPIHandler {
 		start++;
 		System.out.println("start 3");
 		startTank(3, context);
+		vertx.executeBlocking(future -> {
+			try (Connection conn = ds.getConnection()) {
+
+				future.complete();
+			} catch (SQLException e) {
+				future.fail(e);
+			}
+		}, future -> {
+			if (future.succeeded()) {
+				context.response().setChunked(true);
+				context.response().write(future.result().toString()).end();
+			} else {
+				LOG.log(Level.SEVERE, "Unexpected exception", future.cause());
+				context.response().setStatusCode(500).end();
+			}
+		});
 	}
 	
 	/**
@@ -343,6 +426,23 @@ public class ArduinoAPIHandler {
 		stop++;
 		System.out.println("stop 3");
 		stopTank(3, context);
+		
+		vertx.executeBlocking(future -> {
+			try (Connection conn = ds.getConnection()) {
+
+				future.complete();
+			} catch (SQLException e) {
+				future.fail(e);
+			}
+		}, future -> {
+			if (future.succeeded()) {
+				context.response().setChunked(true);
+				context.response().write(future.result().toString()).end();
+			} else {
+				LOG.log(Level.SEVERE, "Unexpected exception", future.cause());
+				context.response().setStatusCode(500).end();
+			}
+		});
 	}
 	
 	/**
