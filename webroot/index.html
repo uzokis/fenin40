@@ -63,11 +63,13 @@
     var tank2Running = 0;
     var tank3Running = 0;
 
+    var address = 'https://fenin40.herokuapp.com/browser'
+
 
     function fillDataSheet() {
         //getJSON('http://192.168.43.4:48964/status',
         //getJSON('http://localhost:8080/browser/data',
-        getJSON('https://fenin40.herokuapp.com/browser/data',
+        getJSON(address + 'data',
             function(err, data) {
                 if (err !== null) {
                     alert('Something went wrong: ' + err);
@@ -198,7 +200,6 @@
     var tank2Status = "off";
     var tank3Status = "off";
 
-    var address = 'https://fenin40.herokuapp.com/browser'
 
     function startStopBak1() {
         var postRequest = new XMLHttpRequest();
