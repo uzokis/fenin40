@@ -47,38 +47,29 @@ public class ArduinoAPIHandler {
 	@Inject
 	private DataSource ds;
 	
-	
+	/**
+	 * create instances for each tank. Currently there are 3 tanks in total.
+	 */
 	private DataProcessor tank1 = new DataProcessor(1);
 	private DataProcessor tank2 = new DataProcessor(2);
 	private DataProcessor tank3 = new DataProcessor(3);
 	
+	/**
+	 * counters for debugging.
+	 */
 	int start = 0;
 	int stop = 0;
 
 
 	
-	/*
-	private static int entryCount;
-		
-	public static void calculateEntryCount() {
-		vertx.executeBlocking(future -> {
-			try (Connection conn = ds.getConnection()) {
-				int ec = DSL.using(conn, SQLDialect.POSTGRES).fetchCount(MEASUREMENT);
-				entryCount = ec;
-				future.complete();
-			} catch (SQLException e) {
-				future.fail(e);
-			}
-		}, future -> {
-			if (future.succeeded()) {
-				System.out.println("entry count calculated successfully");
-			} else {
-				LOG.log(Level.SEVERE, "Unexpected exception", future.cause());
-				System.out.println("failed calculating entry count");
-			}
-		});
-	}
-	*/
+	/**
+	 * handle GET requests from arduino for information about the state of tank 1.
+	 * Response is "STAReeen" if tank 1 needs to be running, "STOPeeen" if tank 1 
+	 * needs to be idle.
+	 * 
+	 * @param context
+	 * 		  routing context of the GET request
+	 */
 	public void handleStartStopTank1(RoutingContext context) {
 		vertx.executeBlocking(future -> {
 			try (Connection conn = ds.getConnection()) {
@@ -104,6 +95,14 @@ public class ArduinoAPIHandler {
 		});
 	}
 	
+	/**
+	 * handle GET requests from arduino for information about the state of tank 2.
+	 * Response is "STARtwee" if tank 2 needs to be running, "STOPtwee" if tank 2 
+	 * needs to be idle.
+	 * 
+	 * @param context
+	 * 		  routing context of the GET request
+	 */
 	public void handleStartStopTank2(RoutingContext context) {
 		vertx.executeBlocking(future -> {
 			try (Connection conn = ds.getConnection()) {
@@ -129,7 +128,14 @@ public class ArduinoAPIHandler {
 		});
 	}
 	
-	
+	/**
+	 * handle GET requests from arduino for information about the state of tank 3.
+	 * Response is "STARdrie" if tank 3 needs to be running, "STOPdrie" if tank 3 
+	 * needs to be idle.
+	 * 
+	 * @param context
+	 * 		  routing context of the GET request
+	 */
 	public void handleStartStopTank3(RoutingContext context) {
 		vertx.executeBlocking(future -> {
 			try (Connection conn = ds.getConnection()) {
@@ -154,7 +160,8 @@ public class ArduinoAPIHandler {
 			}
 		});
 	}
-
+	
+	/*
 	public void handleHTMLFile(RoutingContext context) {
 		vertx.executeBlocking(future -> {
 				HttpServerResponse response = context.response();
@@ -174,6 +181,7 @@ public class ArduinoAPIHandler {
 		}
 	});
 	}
+	*/
 	
 	/**
 	 *  example handler by Eli
@@ -249,6 +257,9 @@ public class ArduinoAPIHandler {
 	/**
 	 * Handle the GET request from the HTML file. 
 	 * Replies with the last known data of the water levels of the 3 tanks.
+	 * 
+	 * @param context
+	 * 		  routing context of the request
 	 */
 	public void handleGetDataHTML(RoutingContext context) {
 		
@@ -289,9 +300,12 @@ public class ArduinoAPIHandler {
 	
 	
 	/**
-	 * Handle POST request from the HTML file.
+	 * Handle POST request from the HTML file to start tank 1.
 	 * Starts tank 1 by answering the next GET request from the Arduino with
 	 * "STAReeen".
+	 * 
+	 * @param context
+	 * 		  routing context of the request
 	 */
 	public void handlePostStart1(RoutingContext context) {
 		System.out.println("start 1");
@@ -316,8 +330,12 @@ public class ArduinoAPIHandler {
 	}
 	
 	/**
+	 * Handle POST request from the HTML file to stop tank 1.
+	 * Stops tank 1 by answering the next GET request from the Arduino with
+	 * "STOPeeen"
 	 * 
 	 * @param context
+	 * 		  routing context of the request
 	 */
 	public void handlePostStop1(RoutingContext context) {
 		System.out.println("stop 1");
@@ -342,8 +360,12 @@ public class ArduinoAPIHandler {
 	}
 	
 	/**
+	 * Handle POST request from the HTML file to start tank 2.
+	 * Starts tank 2 by answering the next GET request from the Arduino with
+	 * "STARtwee".
 	 * 
 	 * @param context
+	 * 		  routing context of the request
 	 */
 	public void handlePostStart2(RoutingContext context) {
 		System.out.println("start 2");
@@ -368,8 +390,12 @@ public class ArduinoAPIHandler {
 	}
 	
 	/**
+	 * Handle POST request from the HTML file to stop tank 2.
+	 * Stops tank 2 by answering the next GET request from the Arduino with
+	 * "STOPtwee".
 	 * 
 	 * @param context
+	 * 		  routing context of the request
 	 */
 	public void handlePostStop2(RoutingContext context) {
 		System.out.println("stop 2");
@@ -393,8 +419,12 @@ public class ArduinoAPIHandler {
 	}
 	
 	/**
+	 * Handle POST request from the HTML file to start tank 3.
+	 * Starts tank 3 by answering the next GET request from the Arduino with
+	 * "STARdrie".
 	 * 
 	 * @param context
+	 * 		  routing context of the request
 	 */
 	public void handlePostStart3(RoutingContext context) {
 		start++;
@@ -419,8 +449,12 @@ public class ArduinoAPIHandler {
 	}
 	
 	/**
+	 * Handle POST request from the HTML file to stop tank 3.
+	 * Stops tank 3 by answering the next GET request from the Arduino with
+	 * "STOPdrie".
 	 * 
 	 * @param context
+	 * 		  routing context of the request
 	 */
 	public void handlePostStop3(RoutingContext context) {
 		stop++;
@@ -449,6 +483,9 @@ public class ArduinoAPIHandler {
 	 * Handle POST request from the Arduino, containing the water levels of the 3 tanks.
 	 * Creates a new instance of the class Measurements for each tank that was given with the
 	 * POST request.
+	 * 
+	 * @param context
+	 * 		  the routing context of the request
 	 */
 	public void handletWaterLevels(RoutingContext context) {
 		System.out.println("hij doet toch nog iets");
@@ -529,19 +566,15 @@ public class ArduinoAPIHandler {
 		System.out.println("komt op einde functie");
 	}
 	
-	/**
-	 * request to make 
-	 */
-	private HttpRequest<Buffer> request;
 	
 	/**
 	 * Stop specified tank by sending a POST request to the Arduino.
-	 * 
-	 * @argument tankNb : integer specifying which tank to stop (tank 1, 2 or 3).
-	 * 
 	 * Post request contains a Json object of which the key is always "STOP" and the 
 	 * value is "eeen" if tankNb equals 1, "twee" if tankNb equals 2, and "drie" if 
 	 * the tankNb equals 3.
+	 * 
+	 * @argument tankNb 
+	 * 			 integer specifying which tank to stop (tank 1, 2 or 3).
 	 */
 	private void stopTank(int tankNb, RoutingContext context) {
 		DataProcessor tankToStop = selectTank(Integer.toString(tankNb));
@@ -550,19 +583,26 @@ public class ArduinoAPIHandler {
 	
 	/**
 	 * Start specified tank by sending a POST request to the Arduino.
-	 * 
-	 * @argument tankNb : integer specifying which tank to start (tank 1, 2 or 3).
-	 * 
 	 * Post request contains a Json object of which the key is always "STAR" and the 
 	 * value is "eeen" if tankNb equals 1, "twee" if tankNb equals 2, and "drie" if 
 	 * the tankNb equals 3.
+	 * 
+	 * @argument tankNb 
+	 * 			 integer specifying which tank to start (tank 1, 2 or 3).
 	 */
 	private void startTank(int tankNb, RoutingContext context) {
 		DataProcessor tankToStart = selectTank(Integer.toString(tankNb));
 		tankToStart.setRunning();
 	}
 	
-	
+	/**
+	 * Selects the right tank according to the given tank number. The tank must be created in this file.
+	 * 
+	 * @param tankNb
+	 * 		  integer number that represents the number of the tank. Each tank has a unique number.
+	 * 
+	 * @return the tank with the tank number that matches the given tank number.
+	 */
 	private DataProcessor selectTank(String tankNb) {
 		if (tankNb.equalsIgnoreCase("1")) {
 			return tank1;
