@@ -71,7 +71,7 @@ public class DataProcessor {
 	 * water level is below this value, the tank does not have enough fluid and will stop
 	 * automatically.
 	 */
-	private final float minLevel = 10;
+	private final float minLevel = 5;
 	
 	/**
 	 * an array that contains the last 5 water level measurements.
@@ -119,7 +119,7 @@ public class DataProcessor {
 	 */
 	public float SmoothenData(float distance) {
 		
-		float waterlevel = convertToWaterLevel(distance);
+		float waterlevel = this.convertToWaterLevel(distance);
 		
 		//shift elements 
 		for (int i = 0; i < 4; i++) {
@@ -131,7 +131,7 @@ public class DataProcessor {
 			
 			//add new data to array
 			this.dataArray[4] = waterlevel;
-			
+			/*
 			//rule 2
 			if(this.checkRightDirection(waterlevel) && !this.stopped) {
 				float smoothedValue = (this.dataArray[3] + this.dataArray[4])/2;
@@ -168,7 +168,7 @@ public class DataProcessor {
 			if (result < 0 && !this.stopped) {
 				this.dataArray[3] = (this.dataArray[3] + this.dataArray[4])/2;
 			}
-						
+			*/			
 		}
 		else {
 			if (this.dataArray[0] == 0) {
@@ -196,6 +196,12 @@ public class DataProcessor {
 		return this.dataArray[4];
 	}
 	
+	/**
+	 * Converts the given distance into the water level of the tank.
+	 * @param distance
+	 * 		  The measured distance between the sensor and the surface of the water.
+	 * @return this.tankHeight - distance
+	 */
 	private float convertToWaterLevel (float distance) {
 		return this.tankHeight - distance;
 	}
