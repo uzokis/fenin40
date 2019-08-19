@@ -93,7 +93,7 @@ public class DataProcessor {
 	 * a float number that represents the maximum difference in cm between 2 consecutive 
 	 * measurements. 
 	 */
-	private static float maxHeightDiff = 2;
+	private static float maxHeightDiff = 5;
 	
 	
 	/**
