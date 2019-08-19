@@ -24,7 +24,7 @@ public class DataProcessor {
 		this.dataArray = new float[] {0, 0, 0, 0, 0};
 		this.stopped = false;
 		this.running = false;
-		this.tankHeight = 24;
+		this.tankHeight = 26;
 	}
 	
 	/**
