@@ -1,6 +1,7 @@
 package eu.fancybrackets.template.handler;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -86,7 +87,7 @@ public class DataProcessor {
 	 * a set that contains all the tank numbers of the existing tanks. Since each tank
 	 * has a unique tank number, the set can not contain duplicates.
 	 */
-	private static Set<Integer> tankNbs;
+	private static Set<Integer> tankNbs = new HashSet<Integer>(Arrays.asList());
 	
 	/**
 	 * a float number that represents the maximum difference in cm between 2 consecutive 
